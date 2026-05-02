@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Depot Epii</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0c4a6e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Background bubbles */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(59,130,246,.08);
+    }
+    body::before { width: 600px; height: 600px; top: -200px; right: -200px; }
+    body::after  { width: 400px; height: 400px; bottom: -150px; left: -150px; }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+    .login-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 44px 40px;
+      box-shadow: 0 30px 60px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    /* Brand */
+    .brand {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .brand-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: white;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 20px rgba(37,99,235,.35);
+    }
+    .brand-name { font-size: 24px; font-weight: 800; color: #0f172a; letter-spacing: -.02em; }
+    .brand-sub  { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap .icon {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8; font-size: 14px;
+      pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #f8fafc;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .input-wrap input:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .input-wrap input::placeholder { color: #cbd5e1; }
+    .toggle-pw {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: #94a3b8; cursor: pointer;
+      font-size: 14px; padding: 4px 6px;
+      border-radius: 6px;
+      transition: color .2s;
+    }
+    .toggle-pw:hover { color: #475569; }
+
+    /* Error */
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+      align-items: center;
+      gap: 9px;
+    }
+    .error-box.show { display: flex; }
+
+    /* Button */
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 6px;
+      letter-spacing: .01em;
+      transition: opacity .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(37,99,235,.4);
+    }
+    .btn-login:hover { opacity: .92; box-shadow: 0 6px 18px rgba(37,99,235,.45); }
+    .btn-login:active { transform: scale(.98); }
+    .btn-login:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    /* Footer */
+    .footer { text-align: center; margin-top: 28px; }
+    .footer p { font-size: 12px; color: rgba(255,255,255,.45); }
+    .version { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 4px; }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 32px 24px; border-radius: 20px; }
+      .brand-name { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon"><i class="fas fa-droplet"></i></div>
+      <div class="brand-name">Depot Epii</div>
+      <div class="brand-sub">Sistem Pencatatan Keuangan</div>
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <i class="fas fa-circle-xmark"></i>
+      <span id="errorText"></span>
+    </div>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="form-group">
+        <label>Username</label>
+        <div class="input-wrap">
+          <i class="fas fa-user icon"></i>
+          <input type="text" id="username" placeholder="Masukkan username"
+                 autocomplete="username" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock icon"></i>
+          <input type="password" id="password" placeholder="Masukkan password"
+                 autocomplete="current-password" required>
+          <button type="button" class="toggle-pw" id="togglePw" tabindex="-1">
+            <i class="fas fa-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <i class="fas fa-right-to-bracket"></i>&nbsp; Masuk
+      </button>
+    </form>
+  </div>
+
+  <div class="footer">
+    <p>© 2026 Depot Epii · Sistem Keuangan Internal</p>
+    <p class="version">v1.0.0</p>
+  </div>
+</div>
+
+<script>
+  // Toggle password visibility
+  document.getElementById('togglePw').addEventListener('click', function () {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  });
+
+  // Enter key on username → focus password
+  document.getElementById('username').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('password').focus(); }
+  });
+
+  // Login submit
+  document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn       = document.getElementById('loginBtn');
+    const errorBox  = document.getElementById('errorBox');
+    const errorText = document.getElementById('errorText');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Memverifikasi...';
+    errorBox.classList.remove('show');
+
+    try {
+      const res  = await fetch('/api/auth/login', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        btn.innerHTML = '<i class="fas fa-circle-check"></i>&nbsp; Berhasil!';
+        setTimeout(() => { window.location.href = '/'; }, 400);
+      } else {
+        errorText.textContent = data.error || 'Login gagal';
+        errorBox.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-right-to-bracket"></i>&nbsp; Masuk';
+        document.getElementById('password').focus();
+      }
+    } catch {
+      errorText.textContent = 'Tidak dapat terhubung ke server';
+      errorBox.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-right-to-bracket"></i>&nbsp; Masuk';
+    }
+  });
+
+  document.getElementById('username').focus();
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depot Epii — Sistem Keuangan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ── Sidebar ─────────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="fas fa-droplet"></i></div>
+    <div class="brand-text">
+      <span class="brand-name">Depot Epii</span>
+      <span class="brand-sub">Sistem Keuangan</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">MENU UTAMA</div>
+    <ul>
+      <li><a href="#" class="nav-link active" data-section="dashboard">
+        <i class="fas fa-chart-pie"></i><span>Dashboard</span>
+      </a></li>
+      <li><a href="#" class="nav-link" data-section="income">
+        <i class="fas fa-arrow-trend-up"></i><span>Pemasukan</span>
+      </a></li>
+      <li><a href="#" class="nav-link" data-section="expenses">
+        <i class="fas fa-arrow-trend-down"></i><span>Pengeluaran</span>
+      </a></li>
+      <li><a href="#" class="nav-link" data-section="unexpected">
+        <i class="fas fa-triangle-exclamation"></i><span>Tidak Terduga</span>
+      </a></li>
+      <li><a href="#" class="nav-link" data-section="debts">
+        <i class="fas fa-hand-holding-dollar"></i><span>Hutang Karyawan</span>
+      </a></li>
+    </ul>
+    <div class="nav-group-label" style="margin-top:20px">LAPORAN</div>
+    <ul>
+      <li><a href="#" class="nav-link" data-section="history">
+        <i class="fas fa-clock-rotate-left"></i><span>Riwayat Harian</span>
+      </a></li>
+      <li><a href="#" class="nav-link" data-section="reports">
+        <i class="fas fa-file-csv"></i><span>Export Laporan</span>
+      </a></li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user" id="sidebarUser">
+      <div class="user-avatar"><i class="fas fa-user"></i></div>
+      <div class="user-info">
+        <span class="user-name" id="userNameDisplay">Admin</span>
+        <span class="user-role">Administrator</span>
+      </div>
+    </div>
+    <div class="sidebar-clock" id="sidebarClock"></div>
+    <button class="btn-logout" id="logoutBtn">
+      <i class="fas fa-right-from-bracket"></i> Keluar
+    </button>
+  </div>
+</aside>
+
+<!-- Backdrop for mobile sidebar -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- ── Main ────────────────────────────────────────────────── -->
+<main class="main" id="main">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+    <div class="topbar-date">
+      <button class="btn-nav" id="prevDay"><i class="fas fa-chevron-left"></i></button>
+      <input type="date" id="datePicker" class="date-input">
+      <button class="btn-nav" id="nextDay"><i class="fas fa-chevron-right"></i></button>
+      <button class="btn-today" id="todayBtn">Hari Ini</button>
+    </div>
+    <div class="topbar-right">
+      <span class="date-display" id="dateDisplay"></span>
+    </div>
+    <div class="topbar-user">
+      <i class="fas fa-circle-user"></i>
+      <span id="topbarUserName"></span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ── DASHBOARD ─────────────────────────────────── -->
+    <section id="section-dashboard" class="section active">
+      <div class="page-header">
+        <h1><i class="fas fa-chart-pie"></i> Dashboard</h1>
+        <span class="page-sub" id="dashDateLabel"></span>
+      </div>
+
+      <div class="cards-grid" id="summaryCards">
+        <!-- injected by JS -->
+      </div>
+
+      <div class="dash-tables">
+        <div class="dash-table-card">
+          <div class="dtcard-header income-color">
+            <i class="fas fa-arrow-trend-up"></i> Pemasukan Terkini
+          </div>
+          <div id="dashIncomeTable"></div>
+        </div>
+        <div class="dash-table-card">
+          <div class="dtcard-header expense-color">
+            <i class="fas fa-arrow-trend-down"></i> Pengeluaran Terkini
+          </div>
+          <div id="dashExpenseTable"></div>
+        </div>
+        <div class="dash-table-card">
+          <div class="dtcard-header unexpected-color">
+            <i class="fas fa-triangle-exclamation"></i> Tidak Terduga
+          </div>
+          <div id="dashUnexpectedTable"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PEMASUKAN ──────────────────────────────────── -->
+    <section id="section-income" class="section hidden">
+      <div class="page-header">
+        <h1><i class="fas fa-arrow-trend-up"></i> Pemasukan Harian</h1>
+        <button class="btn btn-success" onclick="openModal('income')">
+          <i class="fas fa-plus"></i> Tambah Pemasukan
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <span class="table-label" id="incomeLabel"></span>
+          <span class="table-total" id="incomeTotal"></span>
+        </div>
+        <div class="table-wrap" id="incomeTableWrap">
+          <div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada data pemasukan</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PENGELUARAN ────────────────────────────────── -->
+    <section id="section-expenses" class="section hidden">
+      <div class="page-header">
+        <h1><i class="fas fa-arrow-trend-down"></i> Pengeluaran</h1>
+        <button class="btn btn-danger" onclick="openModal('expenses')">
+          <i class="fas fa-plus"></i> Tambah Pengeluaran
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <span class="table-label" id="expensesLabel"></span>
+          <span class="table-total" id="expensesTotal"></span>
+        </div>
+        <div class="table-wrap" id="expensesTableWrap">
+          <div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada data pengeluaran</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TIDAK TERDUGA ──────────────────────────────── -->
+    <section id="section-unexpected" class="section hidden">
+      <div class="page-header">
+        <h1><i class="fas fa-triangle-exclamation"></i> Pengeluaran Tidak Terduga</h1>
+        <button class="btn btn-warning" onclick="openModal('unexpected')">
+          <i class="fas fa-plus"></i> Tambah Pengeluaran Tak Terduga
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <span class="table-label" id="unexpectedLabel"></span>
+          <span class="table-total" id="unexpectedTotal"></span>
+        </div>
+        <div class="table-wrap" id="unexpectedTableWrap">
+          <div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada pengeluaran tak terduga</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── HUTANG KARYAWAN ────────────────────────────── -->
+    <section id="section-debts" class="section hidden">
+      <div class="page-header">
+        <h1><i class="fas fa-hand-holding-dollar"></i> Hutang Karyawan</h1>
+        <button class="btn btn-purple" onclick="openModal('debts')">
+          <i class="fas fa-plus"></i> Tambah Hutang
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="filter-tabs" id="debtFilter">
+            <button class="filter-btn active" data-filter="all">Semua</button>
+            <button class="filter-btn" data-filter="belum lunas">Belum Lunas</button>
+            <button class="filter-btn" data-filter="lunas">Lunas</button>
+          </div>
+          <span class="table-total" id="debtsTotal"></span>
+        </div>
+        <div class="table-wrap" id="debtsTableWrap">
+          <div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada data hutang karyawan</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RIWAYAT ─────────────────────────────────────── -->
+    <section id="section-history" class="section hidden">
+      <div class="page-header">
+        <h1><i class="fas fa-clock-rotate-left"></i> Riwayat Harian</h1>
+        <div class="month-nav">
+          <button class="btn-nav" id="histPrevMonth"><i class="fas fa-chevron-left"></i></button>
+          <span id="histMonthLabel" class="month-label"></span>
+          <button class="btn-nav" id="histNextMonth"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+      <div id="historyContent">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat riwayat...</div>
+      </div>
+    </section>
+
+    <!-- ── LAPORAN / EXPORT ───────────────────────────── -->
+    <section id="section-reports" class="section hidden">
+      <div class="page-header">
+        <h1><i class="fas fa-file-csv"></i> Export Laporan</h1>
+      </div>
+
+      <div class="report-cards">
+        <div class="report-card">
+          <div class="report-icon" style="background:var(--success-light);color:var(--success)">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <h3>Laporan Harian</h3>
+          <p>Export data transaksi untuk satu tanggal ke format CSV yang dapat dibuka di Excel.</p>
+          <div class="form-group">
+            <label>Pilih Tanggal</label>
+            <input type="date" id="exportDailyDate" class="form-input">
+          </div>
+          <button class="btn btn-success btn-block" onclick="exportDaily()">
+            <i class="fas fa-download"></i> Download CSV Harian
+          </button>
+        </div>
+
+        <div class="report-card">
+          <div class="report-icon" style="background:var(--primary-light);color:var(--primary)">
+            <i class="fas fa-calendar-month"></i>
+          </div>
+          <h3>Laporan Bulanan</h3>
+          <p>Export semua transaksi dalam satu bulan termasuk hutang karyawan ke format CSV.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bulan</label>
+              <select id="exportMonth" class="form-input">
+                <option value="01">Januari</option><option value="02">Februari</option>
+                <option value="03">Maret</option><option value="04">April</option>
+                <option value="05">Mei</option><option value="06">Juni</option>
+                <option value="07">Juli</option><option value="08">Agustus</option>
+                <option value="09">September</option><option value="10">Oktober</option>
+                <option value="11">November</option><option value="12">Desember</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tahun</label>
+              <input type="number" id="exportYear" class="form-input" min="2020" max="2099" value="2026">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="exportMonthly()">
+            <i class="fas fa-download"></i> Download CSV Bulanan
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ── Modal ────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal hidden" id="modal">
+  <div class="modal-header">
+    <h3 id="modalTitle"><i id="modalIcon"></i> <span id="modalTitleText"></span></h3>
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────── -->
+<div id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
