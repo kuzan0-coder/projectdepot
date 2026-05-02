@@ -2,11 +2,15 @@
 --  Database Depot Epii - Sistem Keuangan
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS depot_epii
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE depot_epii;
+-- Tabel Users
+CREATE TABLE IF NOT EXISTS users (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  username   VARCHAR(100) NOT NULL UNIQUE,
+  password   VARCHAR(255) NOT NULL,
+  full_name  VARCHAR(255) NOT NULL,
+  role       ENUM('admin','user') DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tabel Pemasukan Harian
 CREATE TABLE IF NOT EXISTS income (
