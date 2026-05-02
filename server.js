@@ -316,23 +316,71 @@ function getLocalIP() {
   return 'localhost';
 }
 
-async function seedAdmin() {
-  try {
-    const [[existing]] = await pool.execute('SELECT id FROM users LIMIT 1');
-    if (!existing) {
-      const hash = await bcrypt.hash('depot2026', 12);
-      await pool.execute(
-        "INSERT INTO users (username, password, full_name, role) VALUES (?,?,?,?)",
-        ['admin', hash, 'Administrator', 'admin']
-      );
-      console.log('  Akun default dibuat: admin / depot2026');
-    }
-  } catch (e) { console.error('[Seed]', e.message); }
+async function initDB() {
+  await pool.execute(`CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    role ENUM('admin','user') DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+
+  await pool.execute(`CREATE TABLE IF NOT EXISTS income (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_date DATE NOT NULL,
+    category VARCHAR(100) NOT NULL DEFAULT 'Penjualan Air',
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(15,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_income_date (record_date)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+
+  await pool.execute(`CREATE TABLE IF NOT EXISTS expenses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_date DATE NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(15,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_expenses_date (record_date)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+
+  await pool.execute(`CREATE TABLE IF NOT EXISTS unexpected_expenses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_date DATE NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(15,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_unexpected_date (record_date)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+
+  await pool.execute(`CREATE TABLE IF NOT EXISTS employee_debts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    amount DECIMAL(15,2) NOT NULL DEFAULT 0,
+    debt_date DATE NOT NULL,
+    status ENUM('belum lunas','lunas') DEFAULT 'belum lunas',
+    paid_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_debt_status (status),
+    INDEX idx_debt_date (debt_date)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+
+  const [[existing]] = await pool.execute('SELECT id FROM users LIMIT 1');
+  if (!existing) {
+    const hash = await bcrypt.hash('depot2026', 12);
+    await pool.execute(
+      "INSERT INTO users (username, password, full_name, role) VALUES (?,?,?,?)",
+      ['admin', hash, 'Administrator', 'admin']
+    );
+    console.log('  Akun default dibuat: admin / depot2026');
+  }
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 async function start() {
-  await seedAdmin();
+  await initDB();
   const ip = getLocalIP();
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n  ╔══════════════════════════════════════════════════╗`);
