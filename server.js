@@ -39,12 +39,13 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit   : 10,
   timezone          : '+07:00',
+  dateStrings       : true,
 });
 
-function todayStr() { return new Date().toLocaleDateString('sv-SE'); }
+function todayStr() { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' }); }
 function fmtDate(v) {
   if (!v) return null;
-  return v instanceof Date ? v.toLocaleDateString('sv-SE') : String(v).split('T')[0];
+  return String(v).split('T')[0];
 }
 
 // ── Auth Routes (tanpa auth) ──────────────────────────────────────────────────
