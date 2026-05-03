@@ -459,12 +459,14 @@ async function fetchHistory() {
       unexpected: acc.unexpected + r.unexpected,
       net: acc.net + r.net,
     }), { income: 0, expenses: 0, unexpected: 0, net: 0 });
+    const finalCumulative = data.length ? data[data.length - 1].cumulative : 0;
 
     el.innerHTML = `
       <div class="history-table-wrap">
         <div class="hist-row header">
           <div>Tanggal</div><div>Pemasukan</div><div>Pengeluaran</div>
-          <div>Tak Terduga</div><div>Bersih</div><div>Aksi</div>
+          <div>Tak Terduga</div><div>Bersih</div>
+          <div class="hist-cumulative-header">Saldo Kas</div><div>Aksi</div>
         </div>
         ${data.map(r => `
           <div class="hist-row">
@@ -473,6 +475,7 @@ async function fetchHistory() {
             <div class="hist-expense">${formatRp(r.expenses)}</div>
             <div class="hist-unexpected">${formatRp(r.unexpected)}</div>
             <div class="hist-net ${r.net >= 0 ? 'positive' : 'negative'}">${formatRp(r.net)}</div>
+            <div class="hist-cumulative ${r.cumulative >= 0 ? 'positive' : 'negative'}">${formatRp(r.cumulative)}</div>
             <div>
               <button class="btn btn-outline" style="padding:5px 12px;font-size:12px" onclick="jumpToDate('${r.date}')">
                 <i class="fas fa-eye"></i> Lihat
@@ -485,6 +488,7 @@ async function fetchHistory() {
           <div class="hist-expense">${formatRp(totals.expenses)}</div>
           <div class="hist-unexpected">${formatRp(totals.unexpected)}</div>
           <div class="hist-net ${totals.net >= 0 ? 'positive' : 'negative'}">${formatRp(totals.net)}</div>
+          <div class="hist-cumulative ${finalCumulative >= 0 ? 'positive' : 'negative'}">${formatRp(finalCumulative)}</div>
           <div></div>
         </div>
       </div>`;

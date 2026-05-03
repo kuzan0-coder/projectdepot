@@ -244,6 +244,13 @@ app.get('/api/history/:year/:month', async (req, res) => {
   try {
     const { year, month } = req.params;
     const prefix = `${year}-${month.padStart(2,'0')}-`;
+    const startOfMonth = `${year}-${month.padStart(2,'0')}-01`;
+
+    const [[incPrev]] = await pool.execute('SELECT COALESCE(SUM(amount),0) t FROM income WHERE record_date < ?', [startOfMonth]);
+    const [[expPrev]] = await pool.execute('SELECT COALESCE(SUM(amount),0) t FROM expenses WHERE record_date < ?', [startOfMonth]);
+    const [[unxPrev]] = await pool.execute('SELECT COALESCE(SUM(amount),0) t FROM unexpected_expenses WHERE record_date < ?', [startOfMonth]);
+    let cumulative = +incPrev.t - +expPrev.t - +unxPrev.t;
+
     const [dates] = await pool.execute(`
       SELECT DISTINCT record_date d FROM (
         SELECT record_date FROM income WHERE record_date LIKE ?
@@ -256,7 +263,9 @@ app.get('/api/history/:year/:month', async (req, res) => {
       const [[inc]] = await pool.execute('SELECT COALESCE(SUM(amount),0) t FROM income WHERE record_date=?', [dt]);
       const [[exp]] = await pool.execute('SELECT COALESCE(SUM(amount),0) t FROM expenses WHERE record_date=?', [dt]);
       const [[unx]] = await pool.execute('SELECT COALESCE(SUM(amount),0) t FROM unexpected_expenses WHERE record_date=?', [dt]);
-      results.push({ date: dt, income: +inc.t, expenses: +exp.t, unexpected: +unx.t, net: +inc.t - +exp.t - +unx.t });
+      const net = +inc.t - +exp.t - +unx.t;
+      cumulative += net;
+      results.push({ date: dt, income: +inc.t, expenses: +exp.t, unexpected: +unx.t, net, cumulative });
     }
     res.json(results);
   } catch (e) { res.status(500).json({ error: e.message }); }

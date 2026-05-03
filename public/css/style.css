@@ -408,13 +408,15 @@ tbody tr:hover td { background: #f8fafc; }
 }
 .hist-row {
   display: grid;
-  grid-template-columns: 140px 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: 140px 1fr 1fr 1fr 1fr 1fr auto;
   align-items: center;
   padding: 14px 20px;
   border-bottom: 1px solid #f1f5f9;
   gap: 12px;
   transition: background var(--transition);
 }
+.hist-cumulative { font-weight: 600; }
+.hist-cumulative-header { font-weight: 700; }
 .hist-row:hover { background: #f8fafc; }
 .hist-row:last-child { border-bottom: none; }
 .hist-row.header {
