@@ -1,3 +1,8 @@
+/* ── Service Worker ───────────────────────────────────────── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
 /* ── Auth Check ───────────────────────────────────────────── */
 (async () => {
   try {

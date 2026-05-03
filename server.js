@@ -19,9 +19,15 @@ app.use(session({
   cookie           : { maxAge: 10 * 60 * 60 * 1000, sameSite: 'lax' },
 }));
 
-// Static assets (CSS/JS) — tidak butuh auth
-app.use('/css', express.static(path.join(__dirname, 'public/css')));
-app.use('/js',  express.static(path.join(__dirname, 'public/js')));
+// Static assets — tidak butuh auth
+app.use('/css',   express.static(path.join(__dirname, 'public/css')));
+app.use('/js',    express.static(path.join(__dirname, 'public/js')));
+app.use('/icons', express.static(path.join(__dirname, 'public/icons')));
+app.get('/manifest.json', (req, res) => res.sendFile(path.join(__dirname, 'public/manifest.json')));
+app.get('/sw.js', (req, res) => {
+  res.setHeader('Service-Worker-Allowed', '/');
+  res.sendFile(path.join(__dirname, 'public/sw.js'));
+});
 
 // ── Database Pool ─────────────────────────────────────────────────────────────
 const pool = mysql.createPool({
