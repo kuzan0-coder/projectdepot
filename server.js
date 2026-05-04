@@ -125,6 +125,19 @@ app.post('/api/income', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.put('/api/income/:id', async (req, res) => {
+  try {
+    const { description, amount, category } = req.body;
+    if (!description || !amount) return res.status(400).json({ error: 'Keterangan dan jumlah wajib diisi' });
+    const [[row]] = await pool.execute('SELECT record_date FROM income WHERE id=?', [req.params.id]);
+    if (!row) return res.status(404).json({ error: 'Data tidak ditemukan' });
+    await pool.execute('UPDATE income SET description=?, amount=?, category=? WHERE id=?',
+      [description, +amount, category || 'Penjualan Air Isi Ulang', req.params.id]);
+    await updateCSV(fmtDate(row.record_date));
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.delete('/api/income/:id', async (req, res) => {
   try {
     const [[row]] = await pool.execute('SELECT record_date FROM income WHERE id=?', [req.params.id]);
@@ -154,6 +167,19 @@ app.post('/api/expenses', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.put('/api/expenses/:id', async (req, res) => {
+  try {
+    const { description, amount } = req.body;
+    if (!description || !amount) return res.status(400).json({ error: 'Keterangan dan jumlah wajib diisi' });
+    const [[row]] = await pool.execute('SELECT record_date FROM expenses WHERE id=?', [req.params.id]);
+    if (!row) return res.status(404).json({ error: 'Data tidak ditemukan' });
+    await pool.execute('UPDATE expenses SET description=?, amount=? WHERE id=?',
+      [description, +amount, req.params.id]);
+    await updateCSV(fmtDate(row.record_date));
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.delete('/api/expenses/:id', async (req, res) => {
   try {
     const [[row]] = await pool.execute('SELECT record_date FROM expenses WHERE id=?', [req.params.id]);
@@ -180,6 +206,19 @@ app.post('/api/unexpected', async (req, res) => {
       [record_date || todayStr(), description, +amount]);
     await updateCSV(record_date || todayStr());
     res.json({ id: r.insertId, message: 'Pengeluaran tak terduga berhasil ditambahkan' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/unexpected/:id', async (req, res) => {
+  try {
+    const { description, amount } = req.body;
+    if (!description || !amount) return res.status(400).json({ error: 'Keterangan dan jumlah wajib diisi' });
+    const [[row]] = await pool.execute('SELECT record_date FROM unexpected_expenses WHERE id=?', [req.params.id]);
+    if (!row) return res.status(404).json({ error: 'Data tidak ditemukan' });
+    await pool.execute('UPDATE unexpected_expenses SET description=?, amount=? WHERE id=?',
+      [description, +amount, req.params.id]);
+    await updateCSV(fmtDate(row.record_date));
+    res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

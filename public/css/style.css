@@ -333,6 +333,8 @@ tbody tr:hover td { background: #f8fafc; }
   font-size: 12px;
   transition: background var(--transition), color var(--transition);
 }
+.action-btn-edit { background: #eff6ff; color: #2563eb; }
+.action-btn-edit:hover { background: #2563eb; color: white; }
 .action-btn-delete { background: var(--danger-light); color: var(--danger); }
 .action-btn-delete:hover { background: var(--danger); color: white; }
 .action-btn-pay { background: var(--success-light); color: var(--success); }

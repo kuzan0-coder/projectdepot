@@ -287,6 +287,9 @@ async function loadIncome() {
             <td>${r.description}</td>
             <td class="amount-cell" style="color:var(--success)">${formatRp(r.amount)}</td>
             <td class="actions-cell">
+              <button class="action-btn action-btn-edit" onclick="editRecord('income',${r.id},'${r.category}',\`${r.description.replace(/`/g,"'")}\`,${r.amount})" title="Edit">
+                <i class="fas fa-pencil"></i>
+              </button>
               <button class="action-btn action-btn-delete" onclick="deleteRecord('income',${r.id})" title="Hapus">
                 <i class="fas fa-trash"></i>
               </button>
@@ -318,6 +321,9 @@ async function loadExpenses() {
             <td>${r.description}</td>
             <td class="amount-cell" style="color:var(--danger)">${formatRp(r.amount)}</td>
             <td class="actions-cell">
+              <button class="action-btn action-btn-edit" onclick="editRecord('expenses',${r.id},null,\`${r.description.replace(/`/g,"'")}\`,${r.amount})" title="Edit">
+                <i class="fas fa-pencil"></i>
+              </button>
               <button class="action-btn action-btn-delete" onclick="deleteRecord('expenses',${r.id})" title="Hapus">
                 <i class="fas fa-trash"></i>
               </button>
@@ -349,6 +355,9 @@ async function loadUnexpected() {
             <td>${r.description}</td>
             <td class="amount-cell" style="color:var(--warning)">${formatRp(r.amount)}</td>
             <td class="actions-cell">
+              <button class="action-btn action-btn-edit" onclick="editRecord('unexpected',${r.id},null,\`${r.description.replace(/`/g,"'")}\`,${r.amount})" title="Edit">
+                <i class="fas fa-pencil"></i>
+              </button>
               <button class="action-btn action-btn-delete" onclick="deleteRecord('unexpected',${r.id})" title="Hapus">
                 <i class="fas fa-trash"></i>
               </button>
@@ -687,6 +696,39 @@ async function submitDebts() {
     toast('Data hutang berhasil ditambahkan');
     closeModal();
     loadDebts();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ── Edit ───────────────────────────────────────────────────── */
+let _editId = null;
+
+function editRecord(type, id, category, description, amount) {
+  _editId = id;
+  openModal(type);
+  setTimeout(() => {
+    if (document.getElementById('fDesc'))     document.getElementById('fDesc').value = description;
+    if (document.getElementById('fAmount'))   document.getElementById('fAmount').value = amount;
+    if (category && document.getElementById('fCategory')) document.getElementById('fCategory').value = category;
+    document.getElementById('modalTitleText').textContent = 'Edit Data';
+    const saveBtn = document.querySelector('#modalBody .form-actions .btn:last-child');
+    if (saveBtn) { saveBtn.innerHTML = '<i class="fas fa-check"></i> Update'; saveBtn.onclick = () => saveEdit(type); }
+  }, 30);
+}
+
+async function saveEdit(type) {
+  const desc   = document.getElementById('fDesc')?.value.trim();
+  const amount = document.getElementById('fAmount')?.value;
+  const cat    = document.getElementById('fCategory')?.value;
+  if (!desc || !amount) return toast('Keterangan dan jumlah wajib diisi', 'error');
+  try {
+    const body = { description: desc, amount: +amount };
+    if (cat) body.category = cat;
+    await api('PUT', `${ENDPOINT_MAP[type]}/${_editId}`, body);
+    toast('Data berhasil diperbarui');
+    closeModal();
+    _editId = null;
+    loadSection(state.section);
+    if (state.section !== 'dashboard') loadDashboard();
   } catch (e) { toast(e.message, 'error'); }
 }
 
