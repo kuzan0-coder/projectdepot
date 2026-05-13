@@ -97,7 +97,10 @@ document.querySelectorAll('.nav-link').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
     switchSection(link.dataset.section);
-    if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').classList.remove('show');
+    }
   });
 });
 
@@ -184,6 +187,11 @@ function updateDateDisplay() {
 /* ── Dashboard ────────────────────────────────────────────── */
 async function loadDashboard() {
   document.getElementById('dashDateLabel').textContent = formatDate(state.date);
+  const summaryEl = document.getElementById('summaryCards');
+  if (!summaryEl.children.length) summaryEl.innerHTML = LOADING_HTML;
+  document.getElementById('dashIncomeTable').innerHTML = LOADING_HTML;
+  document.getElementById('dashExpenseTable').innerHTML = LOADING_HTML;
+  document.getElementById('dashUnexpectedTable').innerHTML = LOADING_HTML;
   try {
     const s = await api('GET', `/api/summary/${state.date}`);
     renderSummaryCards(s);
@@ -263,9 +271,14 @@ function renderDashMini(containerId, rows, type) {
   </table>`;
 }
 
+/* ── Loading helper ───────────────────────────────────────── */
+const LOADING_HTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>';
+
 /* ── Income ───────────────────────────────────────────────── */
 async function loadIncome() {
   document.getElementById('incomeLabel').textContent = formatDate(state.date);
+  document.getElementById('incomeTotal').innerHTML = '';
+  document.getElementById('incomeTableWrap').innerHTML = LOADING_HTML;
   try {
     const rows = await api('GET', `/api/income/${state.date}`);
     const total = rows.reduce((s, r) => s + +r.amount, 0);
@@ -303,6 +316,8 @@ async function loadIncome() {
 /* ── Expenses ──────────────────────────────────────────────── */
 async function loadExpenses() {
   document.getElementById('expensesLabel').textContent = formatDate(state.date);
+  document.getElementById('expensesTotal').innerHTML = '';
+  document.getElementById('expensesTableWrap').innerHTML = LOADING_HTML;
   try {
     const rows = await api('GET', `/api/expenses/${state.date}`);
     const total = rows.reduce((s, r) => s + +r.amount, 0);
@@ -337,6 +352,8 @@ async function loadExpenses() {
 /* ── Unexpected ────────────────────────────────────────────── */
 async function loadUnexpected() {
   document.getElementById('unexpectedLabel').textContent = formatDate(state.date);
+  document.getElementById('unexpectedTotal').innerHTML = '';
+  document.getElementById('unexpectedTableWrap').innerHTML = LOADING_HTML;
   try {
     const rows = await api('GET', `/api/unexpected/${state.date}`);
     const total = rows.reduce((s, r) => s + +r.amount, 0);
@@ -370,6 +387,8 @@ async function loadUnexpected() {
 
 /* ── Debts ─────────────────────────────────────────────────── */
 async function loadDebts() {
+  document.getElementById('debtsTotal').innerHTML = '';
+  document.getElementById('debtsTableWrap').innerHTML = LOADING_HTML;
   try {
     const rows = await api('GET', `/api/debts?status=${state.debtFilter}`);
     const unpaid = rows.filter(r => r.status === 'belum lunas').reduce((s, r) => s + +r.amount, 0);

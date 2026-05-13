@@ -1,4 +1,4 @@
-const CACHE = 'depot-epii-v1';
+const CACHE = 'depot-epii-v2';
 const STATIC = [
   '/',
   '/login',
